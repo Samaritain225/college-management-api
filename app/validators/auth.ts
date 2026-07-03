@@ -6,3 +6,10 @@ export const loginValidator = vine.compile(
     password: vine.string(),
   })
 )
+
+export const refreshValidator = vine.compile(
+  vine.object({
+    refreshToken: vine.string(),
+  })
+)
+

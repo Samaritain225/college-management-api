@@ -5,6 +5,7 @@ type ParamValue = string | number | bigint | boolean
 export type ScannedRoutes = {
   ALL: {
     'access_tokens.store': { paramsTuple?: []; params?: {} }
+    'access_tokens.refresh': { paramsTuple?: []; params?: {} }
     'access_tokens.destroy': { paramsTuple?: []; params?: {} }
     'access_tokens.show': { paramsTuple?: []; params?: {} }
     'users.index': { paramsTuple?: []; params?: {} }
@@ -31,6 +32,7 @@ export type ScannedRoutes = {
   }
   POST: {
     'access_tokens.store': { paramsTuple?: []; params?: {} }
+    'access_tokens.refresh': { paramsTuple?: []; params?: {} }
     'access_tokens.destroy': { paramsTuple?: []; params?: {} }
     'users.store': { paramsTuple?: []; params?: {} }
     'investors.store': { paramsTuple?: []; params?: {} }

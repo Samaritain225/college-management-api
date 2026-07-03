@@ -16,6 +16,7 @@ router
     router
       .group(() => {
         router.post('login', [AccessTokensController, 'store'])
+        router.post('refresh', [AccessTokensController, 'refresh'])
         router.post('logout', [AccessTokensController, 'destroy']).use(middleware.auth())
         router.get('me', [AccessTokensController, 'show']).use(middleware.auth())
       })

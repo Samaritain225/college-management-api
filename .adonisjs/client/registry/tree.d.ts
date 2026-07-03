@@ -4,6 +4,7 @@ import type { routes } from './index.ts'
 export interface ApiDefinition {
   accessTokens: {
     store: typeof routes['access_tokens.store']
+    refresh: typeof routes['access_tokens.refresh']
     destroy: typeof routes['access_tokens.destroy']
     show: typeof routes['access_tokens.show']
   }

@@ -19,6 +19,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'access_tokens.refresh': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/refresh'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/auth').refreshValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/auth').refreshValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['refresh']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['refresh']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'access_tokens.destroy': {
     methods: ["POST"]
     pattern: '/api/v1/auth/logout'

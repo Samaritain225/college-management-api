@@ -118,6 +118,23 @@ export class InvestorSchema extends BaseModel {
   declare userId: string | null
 }
 
+export class RefreshTokenSchema extends BaseModel {
+  static $columns = ['createdAt', 'expiresAt', 'id', 'revokedAt', 'tokenHash', 'userId'] as const
+  $columns = RefreshTokenSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime()
+  declare revokedAt: DateTime | null
+  @column()
+  declare tokenHash: string
+  @column()
+  declare userId: string
+}
+
 export class RoleSchema extends BaseModel {
   static $columns = ['createdAt', 'description', 'id', 'label'] as const
   $columns = RoleSchema.$columns
