@@ -59,10 +59,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/api/v1/users'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/investor').createInvestorValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/user').createUserValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/investor').createInvestorValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').createUserValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/users_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/users_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -71,10 +71,10 @@ export interface Registry {
     methods: ["PATCH"]
     pattern: '/api/v1/users/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/investor').updateInvestorValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateUserValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/investor').updateInvestorValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateUserValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/users_controller').default['update']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/users_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -101,6 +101,54 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/users_controller').default['reactivate']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/users_controller').default['reactivate']>>>
+    }
+  }
+  'investors.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/investors'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/investors_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/investors_controller').default['index']>>>
+    }
+  }
+  'investors.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/investors'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/investor').createInvestorValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/investor').createInvestorValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/investors_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/investors_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'investors.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/investors/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/investor').updateInvestorValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/investor').updateInvestorValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/investors_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/investors_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'roles.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/roles'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/roles_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/roles_controller').default['index']>>>
     }
   }
 }

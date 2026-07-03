@@ -3,6 +3,8 @@ import router from '@adonisjs/core/services/router'
 
 const AccessTokensController = () => import('#controllers/access_tokens_controller')
 const UsersController = () => import('#controllers/users_controller')
+const InvestorsController = () => import('#controllers/investors_controller')
+const RolesController = () => import('#controllers/roles_controller')
 
 router.get('/health', () => {
   return { status: 'ok' }
@@ -30,5 +32,18 @@ router
       })
       .prefix('users')
       .use(middleware.auth())
+
+    // Investor management routes (financial stake)
+    router
+      .group(() => {
+        router.get('/', [InvestorsController, 'index'])
+        router.post('/', [InvestorsController, 'store'])
+        router.patch('/:id', [InvestorsController, 'update'])
+      })
+      .prefix('investors')
+      .use(middleware.auth())
+
+    // Roles list (for frontend dropdowns)
+    router.get('/roles', [RolesController, 'index']).use(middleware.auth())
   })
   .prefix('/api/v1')

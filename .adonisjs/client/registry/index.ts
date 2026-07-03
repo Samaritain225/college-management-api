@@ -54,6 +54,30 @@ const routes = {
     tokens: [{"old":"/api/v1/users/:id/reactivate","type":0,"val":"api","end":""},{"old":"/api/v1/users/:id/reactivate","type":0,"val":"v1","end":""},{"old":"/api/v1/users/:id/reactivate","type":0,"val":"users","end":""},{"old":"/api/v1/users/:id/reactivate","type":1,"val":"id","end":""},{"old":"/api/v1/users/:id/reactivate","type":0,"val":"reactivate","end":""}],
     types: placeholder as Registry['users.reactivate']['types'],
   },
+  'investors.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/investors',
+    tokens: [{"old":"/api/v1/investors","type":0,"val":"api","end":""},{"old":"/api/v1/investors","type":0,"val":"v1","end":""},{"old":"/api/v1/investors","type":0,"val":"investors","end":""}],
+    types: placeholder as Registry['investors.index']['types'],
+  },
+  'investors.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/investors',
+    tokens: [{"old":"/api/v1/investors","type":0,"val":"api","end":""},{"old":"/api/v1/investors","type":0,"val":"v1","end":""},{"old":"/api/v1/investors","type":0,"val":"investors","end":""}],
+    types: placeholder as Registry['investors.store']['types'],
+  },
+  'investors.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/investors/:id',
+    tokens: [{"old":"/api/v1/investors/:id","type":0,"val":"api","end":""},{"old":"/api/v1/investors/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/investors/:id","type":0,"val":"investors","end":""},{"old":"/api/v1/investors/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['investors.update']['types'],
+  },
+  'roles.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/roles',
+    tokens: [{"old":"/api/v1/roles","type":0,"val":"api","end":""},{"old":"/api/v1/roles","type":0,"val":"v1","end":""},{"old":"/api/v1/roles","type":0,"val":"roles","end":""}],
+    types: placeholder as Registry['roles.index']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

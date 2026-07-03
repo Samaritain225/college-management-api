@@ -3,13 +3,10 @@ import { BaseTransformer } from '@adonisjs/core/transformers'
 
 export default class InvestorTransformer extends BaseTransformer<Investor> {
   toObject() {
-    return this.pick(this.resource, [
+    const base = this.pick(this.resource, [
       'id',
+      'userId',
       'name',
-      'email',
-      'phone',
-      'role',
-      'isActive',
       'agreedContribution',
       'joinedAt',
       'createdBy',
@@ -17,5 +14,19 @@ export default class InvestorTransformer extends BaseTransformer<Investor> {
       'createdAt',
       'updatedAt',
     ])
+
+    // Include linked user's name/email for convenience when userId is set
+    const investor = this.resource as any
+    if (investor.$extras?.userName || investor.$extras?.userEmail) {
+      return {
+        ...base,
+        user: {
+          name: investor.$extras.userName ?? null,
+          email: investor.$extras.userEmail ?? null,
+        },
+      }
+    }
+
+    return base
   }
 }

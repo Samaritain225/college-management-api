@@ -8,18 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = [
-    'abilities',
-    'createdAt',
-    'expiresAt',
-    'hash',
-    'id',
-    'lastUsedAt',
-    'name',
-    'tokenableId',
-    'type',
-    'updatedAt',
-  ] as const
+  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
   declare abilities: string
@@ -57,17 +46,7 @@ export class BudgetCategorySchema extends BaseModel {
 }
 
 export class ContributionSchema extends BaseModel {
-  static $columns = [
-    'amount',
-    'createdAt',
-    'id',
-    'investorId',
-    'method',
-    'note',
-    'paidAt',
-    'recordedBy',
-    'syncedAt',
-  ] as const
+  static $columns = ['amount', 'createdAt', 'id', 'investorId', 'method', 'note', 'paidAt', 'recordedBy', 'syncedAt'] as const
   $columns = ContributionSchema.$columns
   @column()
   declare amount: number
@@ -90,18 +69,7 @@ export class ContributionSchema extends BaseModel {
 }
 
 export class ExpenseSchema extends BaseModel {
-  static $columns = [
-    'amount',
-    'categoryId',
-    'createdAt',
-    'description',
-    'id',
-    'receiptPhotoPath',
-    'recordedBy',
-    'reversesExpenseId',
-    'spentAt',
-    'syncedAt',
-  ] as const
+  static $columns = ['amount', 'categoryId', 'createdAt', 'description', 'id', 'receiptPhotoPath', 'recordedBy', 'reversesExpenseId', 'spentAt', 'syncedAt'] as const
   $columns = ExpenseSchema.$columns
   @column()
   declare amount: number
@@ -126,24 +94,46 @@ export class ExpenseSchema extends BaseModel {
 }
 
 export class InvestorSchema extends BaseModel {
-  static $columns = [
-    'agreedContribution',
-    'createdAt',
-    'createdBy',
-    'email',
-    'id',
-    'isActive',
-    'joinedAt',
-    'name',
-    'password',
-    'phone',
-    'role',
-    'syncedAt',
-    'updatedAt',
-  ] as const
+  static $columns = ['agreedContribution', 'createdAt', 'createdBy', 'id', 'joinedAt', 'name', 'phone', 'syncedAt', 'updatedAt', 'userId'] as const
   $columns = InvestorSchema.$columns
   @column()
   declare agreedContribution: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdBy: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime()
+  declare joinedAt: DateTime
+  @column()
+  declare name: string
+  @column()
+  declare phone: string | null
+  @column.dateTime()
+  declare syncedAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string | null
+}
+
+export class RoleSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'id', 'label'] as const
+  $columns = RoleSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare label: string
+}
+
+export class UserSchema extends BaseModel {
+  static $columns = ['createdAt', 'createdBy', 'email', 'id', 'isActive', 'name', 'password', 'phone', 'roleId', 'updatedAt'] as const
+  $columns = UserSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
@@ -154,8 +144,6 @@ export class InvestorSchema extends BaseModel {
   declare id: string
   @column()
   declare isActive: boolean
-  @column.dateTime()
-  declare joinedAt: DateTime
   @column()
   declare name: string
   @column({ serializeAs: null })
@@ -163,9 +151,7 @@ export class InvestorSchema extends BaseModel {
   @column()
   declare phone: string | null
   @column()
-  declare role: any
-  @column.dateTime()
-  declare syncedAt: DateTime | null
+  declare roleId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

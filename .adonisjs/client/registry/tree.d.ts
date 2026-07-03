@@ -14,4 +14,12 @@ export interface ApiDefinition {
     deactivate: typeof routes['users.deactivate']
     reactivate: typeof routes['users.reactivate']
   }
+  investors: {
+    index: typeof routes['investors.index']
+    store: typeof routes['investors.store']
+    update: typeof routes['investors.update']
+  }
+  roles: {
+    index: typeof routes['roles.index']
+  }
 }

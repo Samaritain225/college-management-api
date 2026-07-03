@@ -1,7 +1,7 @@
-import Investor from '#models/investor'
+import User from '#models/user'
 import { loginValidator } from '#validators/auth'
 import type { HttpContext } from '@adonisjs/core/http'
-import InvestorTransformer from '#transformers/investor_transformer'
+import UserTransformer from '#transformers/user_transformer'
 
 export default class AccessTokensController {
   /**
@@ -10,14 +10,14 @@ export default class AccessTokensController {
   async store({ request, response, serialize }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
 
-    const investor = await Investor.query().where('email', email).first()
-    if (!investor) {
+    const user = await User.query().where('email', email).first()
+    if (!user) {
       return response.unauthorized({
         errors: [{ message: 'Invalid credentials' }],
       })
     }
 
-    if (!investor.isActive) {
+    if (!user.isActive) {
       return response.forbidden({
         errors: [{ message: 'account deactivated' }],
       })
@@ -25,17 +25,17 @@ export default class AccessTokensController {
 
     try {
       // Verify credentials using Lucid AuthFinder
-      await Investor.verifyCredentials(email, password)
+      await User.verifyCredentials(email, password)
     } catch {
       return response.unauthorized({
         errors: [{ message: 'Invalid credentials' }],
       })
     }
 
-    const token = await Investor.accessTokens.create(investor)
+    const token = await User.accessTokens.create(user)
 
     return serialize({
-      user: InvestorTransformer.transform(investor),
+      user: UserTransformer.transform(user),
       token: token.value!.release(),
     })
   }
@@ -44,9 +44,9 @@ export default class AccessTokensController {
    * GET /auth/me
    */
   async show({ auth, serialize }: HttpContext) {
-    const investor = auth.getUserOrFail()
+    const user = auth.getUserOrFail()
     return serialize({
-      user: InvestorTransformer.transform(investor),
+      user: UserTransformer.transform(user),
     })
   }
 
@@ -54,9 +54,9 @@ export default class AccessTokensController {
    * POST /auth/logout
    */
   async destroy({ auth }: HttpContext) {
-    const investor = auth.getUserOrFail()
-    if (investor.currentAccessToken) {
-      await Investor.accessTokens.delete(investor, investor.currentAccessToken.identifier)
+    const user = auth.getUserOrFail()
+    if (user.currentAccessToken) {
+      await User.accessTokens.delete(user, user.currentAccessToken.identifier)
     }
 
     return {

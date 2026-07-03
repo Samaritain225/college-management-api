@@ -12,24 +12,34 @@ export type ScannedRoutes = {
     'users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.deactivate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.reactivate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'investors.index': { paramsTuple?: []; params?: {} }
+    'investors.store': { paramsTuple?: []; params?: {} }
+    'investors.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'roles.index': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'access_tokens.show': { paramsTuple?: []; params?: {} }
     'users.index': { paramsTuple?: []; params?: {} }
+    'investors.index': { paramsTuple?: []; params?: {} }
+    'roles.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'access_tokens.show': { paramsTuple?: []; params?: {} }
     'users.index': { paramsTuple?: []; params?: {} }
+    'investors.index': { paramsTuple?: []; params?: {} }
+    'roles.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'access_tokens.store': { paramsTuple?: []; params?: {} }
     'access_tokens.destroy': { paramsTuple?: []; params?: {} }
     'users.store': { paramsTuple?: []; params?: {} }
+    'investors.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
     'users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.deactivate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.reactivate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'investors.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

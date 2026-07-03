@@ -18,10 +18,10 @@ export default class extends BaseSeeder {
       return
     }
 
-    // Check if super_admin already exists
+    // Check if super_admin already exists in users table
     const existing = await db
-      .from('investors')
-      .where('role', 'super_admin')
+      .from('users')
+      .where('role_id', 'super_admin')
       .orWhere('email', email)
       .first()
 
@@ -32,15 +32,13 @@ export default class extends BaseSeeder {
 
     const hashedPassword = await hash.make(password)
 
-    await db.table('investors').insert({
+    await db.table('users').insert({
       id: randomUUID(),
       name,
       email,
       password: hashedPassword,
-      role: 'super_admin',
+      role_id: 'super_admin',
       is_active: true,
-      agreed_contribution: 0,
-      joined_at: DateTime.now().toSQL(),
       created_at: DateTime.now().toSQL(),
       updated_at: DateTime.now().toSQL(),
     })
