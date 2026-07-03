@@ -1,0 +1,713 @@
+{
+  "info": {
+    "_postman_id": "9bc3b648-6a56-42f8-bf78-ef27d04ea78e",
+    "name": "College Budget API",
+    "description": "# College Budget API - Postman Collection\n\nThis collection contains all the implemented authentication and user management API endpoints for the College Budget API.\n\n### Authentication Model\nAuthentication is stateless using long-lived bearer tokens. \n1. Login via `POST /auth/login` to obtain an access token.\n2. Pass the token via the `Authorization: Bearer {{access_token}}` header on all authenticated endpoints.\n\n### Collection Variables & Automation\nThis collection utilizes collection-level variables for state preservation between requests:\n- `base_url` - API base path, defaults to `http://localhost:3333/api/v1`\n- `access_token` - Dynamically populated on login; reused by authenticated requests\n- `super_admin_email` / `super_admin_password` - Sourced from the local environment\n- `created_investor_id` / `created_investor_email` / `created_investor_password` - Dynamically populated and used to test CRUD operations without manual entry\n\n### Running the Collection\nFor a clean test run, execute the requests in order.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Stateless authentication flow. Covers login, logout, and session restoration.",
+      "item": [
+        {
+          "name": "Login (super_admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Token is returned and saved\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.collectionVariables.set(\"access_token\", jsonData.token);",
+                  "});",
+                  "",
+                  "pm.test(\"Security check: Password hash must NOT be in response\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user).to.not.have.property('password');",
+                  "    pm.expect(jsonData.user).to.not.have.property('passwordHash');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{super_admin_email}}\",\n  \"password\": \"{{super_admin_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticates a user and returns an access token along with profile details.\n\n- **Role required**: Public / Any registered account.\n- **Body Parameters**:\n  - `email`: string (required, valid email format, max 254 chars)\n  - `password`: string (required)\n- **Expected Response**: Status `200 OK` returning the user object and a bearer `token`."
+          },
+          "response": []
+        },
+        {
+          "name": "Login (invalid password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Contains error message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.errors[0].message).to.equal(\"Invalid credentials\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{super_admin_email}}\",\n  \"password\": \"WrongPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Attempts authentication with incorrect credentials. Proves access is denied with proper HTTP code.\n\n- **Role required**: Public.\n- **Expected Response**: Status `401 Unauthorized` with an error message of 'Invalid credentials'."
+          },
+          "response": []
+        },
+        {
+          "name": "Login (deactivated account)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test(\"Rejection message points to account deactivation\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.errors[0].message).to.equal(\"account deactivated\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{created_investor_email}}\",\n  \"password\": \"{{created_investor_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Attempts authentication with a deactivated investor account. \n\n*NOTE: Run this request after the 'Deactivate investor' endpoint has executed.*\n\n- **Expected Response**: Status `403 Forbidden` returning a specific error message stating 'account deactivated' to prevent logins for inactive members."
+          },
+          "response": []
+        },
+        {
+          "name": "Get current user (/auth/me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns the logged in user profile\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user).to.have.property('id');",
+                  "    pm.expect(jsonData.user.email).to.equal(pm.collectionVariables.get(\"super_admin_email\"));",
+                  "});",
+                  "",
+                  "pm.test(\"Security check: Password hash must NOT be in response\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user).to.not.have.property('password');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Fetches the current authenticated user's profile to restore frontend sessions.\n\n- **Role required**: Active Authenticated account.\n- **Expected Response**: Status `200 OK` returning the user object profile details."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns success log message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.equal(\"Logged out successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Revokes the active bearer access token on the backend.\n\n- **Role required**: Authenticated account.\n- **Expected Response**: Status `200 OK` with a logout confirmation message."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "description": "Endpoints to manage investor and admin accounts. Run these endpoints sequentially.",
+      "item": [
+        {
+          "name": "List users (as super_admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns list of users\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.users).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "Lists all investors including status. Results sorted alphabetically.\n\n- **Role required**: `admin` or `super_admin` (`manageUsers` ability).\n- **Expected Response**: Status `200 OK` returning an array of users."
+          },
+          "response": []
+        },
+        {
+          "name": "Create investor",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generate random email and password for sandbox isolation",
+                  "var randomSuffix = Math.floor(Math.random() * 1000000);",
+                  "var tempEmail = \"test_investor_\" + randomSuffix + \"@example.com\";",
+                  "var tempPassword = \"Password_\" + randomSuffix + \"!\";",
+                  "pm.collectionVariables.set(\"created_investor_email\", tempEmail);",
+                  "pm.collectionVariables.set(\"created_investor_password\", tempPassword);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Saves created investor details\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user).to.have.property('id');",
+                  "    pm.collectionVariables.set(\"created_investor_id\", jsonData.user.id);",
+                  "});",
+                  "",
+                  "pm.test(\"Security check: Password hash must NOT be in response\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user).to.not.have.property('password');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Investor\",\n  \"email\": \"{{created_investor_email}}\",\n  \"password\": \"{{created_investor_password}}\",\n  \"role\": \"investor\",\n  \"agreedContribution\": 5000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "Registers a new investor account. Generates a dynamic email on pre-request to prevent constraint violations.\n\n- **Role required**: `admin` or `super_admin` (`manageUsers` ability).\n- **Body Parameters**:\n  - `name`: string (required, max 255 chars)\n  - `email`: string (required, email format, unique, max 254 chars)\n  - `password`: string (required, min 8, max 32 chars)\n  - `role`: enum string (`super_admin`, `admin`, `investor` - required)\n  - `agreedContribution`: number (required, min 0)\n- **Expected Response**: Status `200 OK` returning the created user object."
+          },
+          "response": []
+        },
+        {
+          "name": "Update investor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Verifies fields updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user.agreedContribution).to.equal(10000);",
+                  "    pm.expect(jsonData.user.name).to.equal(\"Updated Investor Name\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Investor Name\",\n  \"agreedContribution\": 10000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{created_investor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{created_investor_id}}"]
+            },
+            "description": "Updates an existing investor's name and/or contribution amount.\n\n- **Role required**: `admin` or `super_admin` (`manageUsers` ability).\n- **Expected Response**: Status `200 OK` returning the updated user object."
+          },
+          "response": []
+        },
+        {
+          "name": "Attempt to deactivate a super_admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deactivation request is rejected\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Contains safety guard error message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.equal(\"A super admin can never be deactivated\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/deactivate",
+              "host": ["{{base_url}}"],
+              "path": ["users", "deactivate"]
+            },
+            "description": "Attempts to deactivate a super admin. This is a negative test confirming that the system guards its admin integrity.\n\n- **Expected Response**: Status `400 Bad Request` with message 'A super admin can never be deactivated'."
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate investor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User isActive field is false\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user.isActive).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{created_investor_id}}/deactivate",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{created_investor_id}}", "deactivate"]
+            },
+            "description": "Soft-deactivates an investor account so that they can no longer log in.\n\n- **Role required**: `admin` or `super_admin` (`manageUsers` ability).\n- **Expected Response**: Status `200 OK` returning the user object with `isActive: false`."
+          },
+          "response": []
+        },
+        {
+          "name": "Attempt login as the now-deactivated investor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login is forbidden\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test(\"Deactivated account warning is returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.errors[0].message).to.equal(\"account deactivated\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{created_investor_email}}\",\n  \"password\": \"{{created_investor_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Verifies that deactivation actually prevents log-in attempts.\n\n- **Expected Response**: Status `403 Forbidden` with error message 'account deactivated'."
+          },
+          "response": []
+        },
+        {
+          "name": "Reactivate investor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User isActive field is true\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user.isActive).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{created_investor_id}}/reactivate",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{created_investor_id}}", "reactivate"]
+            },
+            "description": "Re-enables a soft-deactivated investor account.\n\n- **Role required**: `admin` or `super_admin` (`manageUsers` ability).\n- **Expected Response**: Status `200 OK` returning the user object with `isActive: true`."
+          },
+          "response": []
+        },
+        {
+          "name": "Attempt user-management actions as a non-admin investor role",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const loginRequest = {",
+                  "  url: pm.collectionVariables.get(\"base_url\") + \"/auth/login\",",
+                  "  method: \"POST\",",
+                  "  header: {",
+                  "    \"Content-Type\": \"application/json\"",
+                  "  },",
+                  "  body: {",
+                  "    mode: \"raw\",",
+                  "    raw: JSON.stringify({",
+                  "      email: pm.collectionVariables.get(\"created_investor_email\"),",
+                  "      password: pm.collectionVariables.get(\"created_investor_password\")",
+                  "    })",
+                  "  }",
+                  "};",
+                  "",
+                  "pm.sendRequest(loginRequest, function (err, res) {",
+                  "  if (res.code === 200) {",
+                  "    const data = res.json();",
+                  "    pm.request.headers.upsert({",
+                  "      key: 'Authorization',",
+                  "      value: 'Bearer ' + data.token",
+                  "    });",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Request is rejected as forbidden\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test(\"Bouncer error message is returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.equal(\"Unauthorized access to user management\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "Attempts user management with non-admin privileges to verify Bouncer policy enforcement.\n\n*NOTE: This request's Pre-request script logs in as the newly created standard investor before calling the endpoint.*"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "description": "Basic server health status checking.",
+      "item": [
+        {
+          "name": "GET /health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Healthy status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal(\"ok\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Uptime and basic status endpoint.\n\n- **Role required**: Public.\n- **Expected Response**: Status `200 OK` with JSON `{\"status\": \"ok\"}`."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3333/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_investor_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_investor_email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_investor_password",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
