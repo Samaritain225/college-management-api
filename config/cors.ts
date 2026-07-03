@@ -14,11 +14,11 @@ const corsConfig = defineConfig({
   enabled: true,
 
   /**
-   * In development, allow every origin to simplify local front/backend setup.
-   * In production, keep an explicit allowlist (empty by default, so no
-   * cross-origin browser access is allowed until configured).
+   * Explicit origin allowlist. The Tauri dev server runs on port 1420, so we
+   * must include it here for local frontend ↔ API communication to work.
+   * In development every origin is also allowed as a fallback.
    */
-  origin: app.inDev ? true : [],
+  origin: app.inDev ? true : ['http://localhost:1420'],
 
   /**
    * HTTP methods accepted for cross-origin requests.
