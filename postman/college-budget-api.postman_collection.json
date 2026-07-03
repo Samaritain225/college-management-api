@@ -690,6 +690,11 @@
       "type": "string"
     },
     {
+      "key": "prod_url",
+      "value": "https://college-management-api-etgz.onrender.com/api/v1",
+      "type": "string"
+    },
+    {
       "key": "access_token",
       "value": "",
       "type": "string"
