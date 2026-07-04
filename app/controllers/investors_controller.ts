@@ -4,6 +4,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { randomUUID } from 'node:crypto'
 import { DateTime } from 'luxon'
 import InvestorTransformer from '#transformers/investor_transformer'
+import { TABLES } from '#constants/tables'
+import activityService from '#services/activity_service'
 
 export default class InvestorsController {
   /**
@@ -16,11 +18,11 @@ export default class InvestorsController {
 
     // Left join users to include linked user name/email for display
     const investors = await Investor.query()
-      .leftJoin('users', 'investors.user_id', 'users.id')
-      .select('investors.*')
-      .select('users.name as userName')
-      .select('users.email as userEmail')
-      .orderBy('investors.name', 'asc')
+      .leftJoin(TABLES.USERS, `${TABLES.INVESTORS}.user_id`, `${TABLES.USERS}.id`)
+      .select(`${TABLES.INVESTORS}.*`)
+      .select(`${TABLES.USERS}.name as userName`)
+      .select(`${TABLES.USERS}.email as userEmail`)
+      .orderBy(`${TABLES.INVESTORS}.name`, 'asc')
 
     return serialize({
       investors: InvestorTransformer.transform(investors),
@@ -47,6 +49,13 @@ export default class InvestorsController {
       createdBy: currentUser.id,
     })
 
+    activityService.log({
+      userId: currentUser.id,
+      action: 'INVESTOR_CREATE',
+      description: `Investor created: ${investor.name}`,
+      metadata: { investorId: investor.id, agreedContribution: investor.agreedContribution },
+    })
+
     return serialize({
       investor: InvestorTransformer.transform(investor),
     })
@@ -55,7 +64,7 @@ export default class InvestorsController {
   /**
    * PATCH /investors/:id
    */
-  async update({ params, request, response, bouncer, serialize }: HttpContext) {
+  async update({ params, request, response, auth, bouncer, serialize }: HttpContext) {
     if (await bouncer.denies('manageUsers')) {
       return response.forbidden({ message: 'Unauthorized to update investors' })
     }
@@ -70,6 +79,13 @@ export default class InvestorsController {
     })
 
     await investor.save()
+
+    activityService.log({
+      userId: auth.getUserOrFail().id,
+      action: 'INVESTOR_UPDATE',
+      description: `Investor updated: ${investor.name}`,
+      metadata: { investorId: investor.id },
+    })
 
     return serialize({
       investor: InvestorTransformer.transform(investor),

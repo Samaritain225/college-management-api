@@ -6,6 +6,7 @@ import UserTransformer from '#transformers/user_transformer'
 import { randomBytes, createHash } from 'node:crypto'
 import { DateTime } from 'luxon'
 import { randomUUID } from 'node:crypto'
+import activityService from '#services/activity_service'
 
 export default class AccessTokensController {
   /**
@@ -49,12 +50,24 @@ export default class AccessTokensController {
 
     const user = await User.query().where('email', email).first()
     if (!user) {
+      activityService.log({
+        userId: null,
+        action: 'AUTH_LOGIN_FAILED',
+        description: `Failed login attempt for email: ${email}`,
+        metadata: { email },
+      })
       return response.unauthorized({
         errors: [{ message: 'Invalid credentials' }],
       })
     }
 
     if (!user.isActive) {
+      activityService.log({
+        userId: user.id,
+        action: 'AUTH_LOGIN_FAILED',
+        description: `Login blocked — account deactivated for user: ${user.name}`,
+        metadata: { email },
+      })
       return response.forbidden({
         errors: [{ message: 'account deactivated' }],
       })
@@ -63,6 +76,12 @@ export default class AccessTokensController {
     try {
       await User.verifyCredentials(email, password)
     } catch {
+      activityService.log({
+        userId: user.id,
+        action: 'AUTH_LOGIN_FAILED',
+        description: `Invalid password attempt for user: ${user.name}`,
+        metadata: { email },
+      })
       return response.unauthorized({
         errors: [{ message: 'Invalid credentials' }],
       })
@@ -73,6 +92,12 @@ export default class AccessTokensController {
 
     // 2. Generate and persist refresh token (14 days)
     const refreshToken = await this.createRefreshToken(user.id)
+
+    activityService.log({
+      userId: user.id,
+      action: 'AUTH_LOGIN',
+      description: `User logged in: ${user.name}`,
+    })
 
     return serialize({
       user: UserTransformer.transform(user),
@@ -105,6 +130,12 @@ export default class AccessTokensController {
         .whereNull('revokedAt')
         .update({ revokedAt: DateTime.now().toSQL() })
 
+      activityService.log({
+        userId: dbToken.userId,
+        action: 'AUTH_TOKEN_REUSE_DETECTED',
+        description: 'Revoked refresh token was reused — all sessions invalidated',
+      })
+
       return response.unauthorized({
         errors: [{ message: 'Refresh token has already been used. Session compromised.' }],
       })
@@ -132,6 +163,12 @@ export default class AccessTokensController {
     // Generate new pair
     const nextAccessToken = await User.accessTokens.create(user)
     const nextRefreshToken = await this.createRefreshToken(user.id)
+
+    activityService.log({
+      userId: user.id,
+      action: 'AUTH_TOKEN_REFRESHED',
+      description: `Access token refreshed for user: ${user.name}`,
+    })
 
     return {
       accessToken: nextAccessToken.value!.release(),
@@ -165,6 +202,12 @@ export default class AccessTokensController {
       .where('userId', user.id)
       .whereNull('revokedAt')
       .update({ revokedAt: DateTime.now().toSQL() })
+
+    activityService.log({
+      userId: user.id,
+      action: 'AUTH_LOGOUT',
+      description: `User logged out: ${user.name}`,
+    })
 
     return {
       message: 'Logged out successfully',

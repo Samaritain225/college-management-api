@@ -4,6 +4,7 @@ import { createUserValidator, updateUserValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import { randomUUID } from 'node:crypto'
 import UserTransformer from '#transformers/user_transformer'
+import activityService from '#services/activity_service'
 
 export default class UsersController {
   /**
@@ -50,6 +51,13 @@ export default class UsersController {
       createdBy: currentUser.id,
     })
 
+    activityService.log({
+      userId: currentUser.id,
+      action: 'USER_CREATE',
+      description: `User created: ${user.name} (${user.email})`,
+      metadata: { targetUserId: user.id, role: user.roleId },
+    })
+
     return serialize({
       user: UserTransformer.transform(user),
     })
@@ -58,7 +66,7 @@ export default class UsersController {
   /**
    * PATCH /users/:id
    */
-  async update({ params, request, response, bouncer, serialize }: HttpContext) {
+  async update({ params, request, response, auth, bouncer, serialize }: HttpContext) {
     if (await bouncer.denies('manageUsers')) {
       return response.forbidden({ message: 'Unauthorized to update users' })
     }
@@ -111,6 +119,13 @@ export default class UsersController {
       await Investor.query().where('userId', user.id).update({ name: payload.name })
     }
 
+    activityService.log({
+      userId: auth.getUserOrFail().id,
+      action: 'USER_UPDATE',
+      description: `User updated: ${user.name} (${user.email})`,
+      metadata: { targetUserId: user.id },
+    })
+
     return serialize({
       user: UserTransformer.transform(user),
     })
@@ -119,7 +134,7 @@ export default class UsersController {
   /**
    * PATCH /users/:id/deactivate
    */
-  async deactivate({ params, response, bouncer, serialize }: HttpContext) {
+  async deactivate({ params, response, auth, bouncer, serialize }: HttpContext) {
     if (await bouncer.denies('manageUsers')) {
       return response.forbidden({ message: 'Unauthorized' })
     }
@@ -141,6 +156,13 @@ export default class UsersController {
     user.isActive = false
     await user.save()
 
+    activityService.log({
+      userId: auth.getUserOrFail().id,
+      action: 'USER_DEACTIVATE',
+      description: `User deactivated: ${user.name} (${user.email})`,
+      metadata: { targetUserId: user.id },
+    })
+
     return serialize({
       user: UserTransformer.transform(user),
     })
@@ -149,7 +171,7 @@ export default class UsersController {
   /**
    * PATCH /users/:id/reactivate
    */
-  async reactivate({ params, response, bouncer, serialize }: HttpContext) {
+  async reactivate({ params, response, auth, bouncer, serialize }: HttpContext) {
     if (await bouncer.denies('manageUsers')) {
       return response.forbidden({ message: 'Unauthorized' })
     }
@@ -165,6 +187,13 @@ export default class UsersController {
 
     user.isActive = true
     await user.save()
+
+    activityService.log({
+      userId: auth.getUserOrFail().id,
+      action: 'USER_REACTIVATE',
+      description: `User reactivated: ${user.name} (${user.email})`,
+      metadata: { targetUserId: user.id },
+    })
 
     return serialize({
       user: UserTransformer.transform(user),
