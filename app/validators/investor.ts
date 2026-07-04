@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { TABLES } from '#constants/tables'
 
 export const createInvestorValidator = vine.compile(
   vine.object({
@@ -9,7 +10,7 @@ export const createInvestorValidator = vine.compile(
       .string()
       .uuid()
       .exists(async (db: any, value: string) => {
-        const match = await db.from('users').where('id', value).first()
+        const match = await db.from(TABLES.USERS).where('id', value).first()
         return !!match
       })
       .nullable()

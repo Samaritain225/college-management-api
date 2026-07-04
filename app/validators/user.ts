@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { TABLES } from '#constants/tables'
 
 /**
  * Role validation: roleId is validated via a live DB check against the
@@ -18,16 +19,14 @@ export const createUserValidator = vine.compile(
       .email()
       .maxLength(254)
       .unique(async (db: any, value: string) => {
-        const match = await db.from('users').where('email', value).first()
+        const match = await db.from(TABLES.USERS).where('email', value).first()
         return !match
       }),
     password: vine.string().minLength(8).maxLength(32),
-    roleId: vine
-      .string()
-      .exists(async (db: any, value: string) => {
-        const match = await db.from('roles').where('id', value).first()
-        return !!match
-      }),
+    roleId: vine.string().exists(async (db: any, value: string) => {
+      const match = await db.from(TABLES.ROLES).where('id', value).first()
+      return !!match
+    }),
     phone: vine.string().nullable().optional(),
   })
 )
@@ -43,7 +42,7 @@ export const updateUserValidator = vine.compile(
         const userId = field.meta.userId
         if (!userId) return true
         const match = await db
-          .from('users')
+          .from(TABLES.USERS)
           .where('email', value)
           .whereNot('id', userId)
           .first()
@@ -54,7 +53,7 @@ export const updateUserValidator = vine.compile(
     roleId: vine
       .string()
       .exists(async (db: any, value: string) => {
-        const match = await db.from('roles').where('id', value).first()
+        const match = await db.from(TABLES.ROLES).where('id', value).first()
         return !!match
       })
       .optional(),

@@ -3,4 +3,6 @@
  * DO NOT EDIT manually
  */
 
-export const listeners = {}
+export const listeners = {
+  ActivityListener: () => import('#listeners/activity_listener'),
+}

@@ -5,6 +5,9 @@
 
 export const controllers = {
   AccessTokens: () => import('#controllers/access_tokens_controller'),
+  Activities: () => import('#controllers/activities_controller'),
+  BudgetCategories: () => import('#controllers/budget_categories_controller'),
+  Expenses: () => import('#controllers/expenses_controller'),
   Investors: () => import('#controllers/investors_controller'),
   Roles: () => import('#controllers/roles_controller'),
   Users: () => import('#controllers/users_controller'),
