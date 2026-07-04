@@ -12,4 +12,3 @@ export const refreshValidator = vine.compile(
     refreshToken: vine.string(),
   })
 )
-

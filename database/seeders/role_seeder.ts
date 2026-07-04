@@ -9,7 +9,11 @@ export default class extends BaseSeeder {
       { id: 'admin', label: 'Administrateur', description: 'Gestion administrative' },
       { id: 'principal', label: 'Proviseur / Directeur', description: 'Direction académique' },
       { id: 'censeur', label: 'Censeur', description: 'Responsable pédagogique' },
-      { id: 'surveillant_general', label: 'Surveillant général', description: 'Discipline et assiduité' },
+      {
+        id: 'surveillant_general',
+        label: 'Surveillant général',
+        description: 'Discipline et assiduité',
+      },
       { id: 'enseignant', label: 'Enseignant', description: 'Personnel enseignant' },
       { id: 'comptable', label: 'Comptable', description: 'Gestion de la trésorerie et comptes' },
       { id: 'secretaire', label: 'Secrétaire', description: 'Secrétariat et accueil' },

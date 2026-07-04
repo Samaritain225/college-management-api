@@ -6,14 +6,26 @@ export default class extends BaseSchema {
   async up() {
     this.schema.alterTable(this.tableName, (table) => {
       table.dropForeign(['tokenable_id'])
-      table.uuid('tokenable_id').notNullable().references('id').inTable('users').onDelete('CASCADE').alter()
+      table
+        .uuid('tokenable_id')
+        .notNullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
+        .alter()
     })
   }
 
   async down() {
     this.schema.alterTable(this.tableName, (table) => {
       table.dropForeign(['tokenable_id'])
-      table.uuid('tokenable_id').notNullable().references('id').inTable('investors').onDelete('CASCADE').alter()
+      table
+        .uuid('tokenable_id')
+        .notNullable()
+        .references('id')
+        .inTable('investors')
+        .onDelete('CASCADE')
+        .alter()
     })
   }
 }
