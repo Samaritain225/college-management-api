@@ -1,10 +1,10 @@
-import User from '#models/user'
 import Investor from '#models/investor'
+import User from '#models/user'
+import activityService from '#services/activity_service'
+import UserTransformer from '#transformers/user_transformer'
 import { createUserValidator, updateUserValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import { randomUUID } from 'node:crypto'
-import UserTransformer from '#transformers/user_transformer'
-import activityService from '#services/activity_service'
 
 export default class UsersController {
   /**

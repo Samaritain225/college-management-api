@@ -32,4 +32,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   SEED_SUPER_ADMIN_EMAIL: Env.schema.string.optional(),
   SEED_SUPER_ADMIN_PASSWORD: Env.schema.string.optional(),
   SEED_SUPER_ADMIN_NAME: Env.schema.string.optional(),
+  SEED_ADMIN_EMAIL: Env.schema.string.optional(),
+  SEED_ADMIN_PASSWORD: Env.schema.string.optional(),
+  SEED_ADMIN_NAME: Env.schema.string.optional(),
 })
