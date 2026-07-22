@@ -5,7 +5,7 @@ const AccessTokensController = () => import('#controllers/access_tokens_controll
 const UsersController = () => import('#controllers/users_controller')
 const InvestorsController = () => import('#controllers/investors_controller')
 const RolesController = () => import('#controllers/roles_controller')
-const BudgetCategoriesController = () => import('#controllers/budget_categories_controller')
+const ExpenseCategoriesController = () => import('#controllers/expense_categories_controller')
 const ExpensesController = () => import('#controllers/expenses_controller')
 
 const ActivitiesController = () => import('#controllers/activities_controller')
@@ -28,49 +28,26 @@ router
 
     // User management routes
     router
-      .group(() => {
-        router.get('/', [UsersController, 'index'])
-        router.post('/', [UsersController, 'store'])
-        router.patch('/:id', [UsersController, 'update'])
-        router.patch('/:id/deactivate', [UsersController, 'deactivate'])
-        router.patch('/:id/reactivate', [UsersController, 'reactivate'])
-      })
-      .prefix('users')
-      .use(middleware.auth())
+      .resource('users', UsersController)
+      .only(['index', 'store', 'update'])
+      .use('*', middleware.auth())
+    router.patch('users/:id/deactivate', [UsersController, 'deactivate']).use(middleware.auth())
+    router.patch('users/:id/reactivate', [UsersController, 'reactivate']).use(middleware.auth())
 
     // Investor management routes (financial stake)
     router
-      .group(() => {
-        router.get('/', [InvestorsController, 'index'])
-        router.post('/', [InvestorsController, 'store'])
-        router.patch('/:id', [InvestorsController, 'update'])
-      })
-      .prefix('investors')
-      .use(middleware.auth())
+      .resource('investors', InvestorsController)
+      .only(['index', 'store', 'update'])
+      .use('*', middleware.auth())
 
-    // Budget category routes
+    // Expense category routes
     router
-      .group(() => {
-        router.get('/', [BudgetCategoriesController, 'index'])
-        router.get('/:id', [BudgetCategoriesController, 'show'])
-        router.post('/', [BudgetCategoriesController, 'store'])
-        router.patch('/:id', [BudgetCategoriesController, 'update'])
-        router.delete('/:id', [BudgetCategoriesController, 'destroy'])
-      })
-      .prefix('categories')
-      .use(middleware.auth())
+      .resource('expense-categories', ExpenseCategoriesController)
+      .apiOnly()
+      .use('*', middleware.auth())
 
     // Expense routes
-    router
-      .group(() => {
-        router.get('/', [ExpensesController, 'index'])
-        router.get('/:id', [ExpensesController, 'show'])
-        router.post('/', [ExpensesController, 'store'])
-        router.patch('/:id', [ExpensesController, 'update'])
-        router.delete('/:id', [ExpensesController, 'destroy'])
-      })
-      .prefix('expenses')
-      .use(middleware.auth())
+    router.resource('expenses', ExpensesController).apiOnly().use('*', middleware.auth())
 
     // User activities log routes
     router.get('/activities', [ActivitiesController, 'index']).use(middleware.auth())

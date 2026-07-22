@@ -5,7 +5,7 @@ export const createExpenseValidator = vine.compile(
   vine.object({
     amount: vine.number().min(0),
     categoryId: vine.string().exists(async (db: any, value: string) => {
-      const match = await db.from(TABLES.BUDGET_CATEGORIES).where('id', value).first()
+      const match = await db.from(TABLES.EXPENSE_CATEGORIES).where('id', value).first()
       return !!match
     }),
     description: vine.string().maxLength(500),
@@ -28,7 +28,7 @@ export const updateExpenseValidator = vine.compile(
     categoryId: vine
       .string()
       .exists(async (db: any, value: string) => {
-        const match = await db.from(TABLES.BUDGET_CATEGORIES).where('id', value).first()
+        const match = await db.from(TABLES.EXPENSE_CATEGORIES).where('id', value).first()
         return !!match
       })
       .optional(),

@@ -8,9 +8,17 @@ export default class extends BaseSchema {
       table.dropForeign(['recorded_by'])
       table.uuid('recorded_by').notNullable().references('id').inTable('users').alter()
     })
+
+    this.schema.alterTable('expense_categories', (table) => {
+      table.uuid('created_by').nullable().references('id').inTable('users').alter()
+    })
   }
 
   async down() {
+    this.schema.alterTable('expense_categories', (table) => {
+      table.dropForeign(['created_by'])
+    })
+
     this.schema.alterTable(this.tableName, (table) => {
       table.dropForeign(['recorded_by'])
       table.uuid('recorded_by').notNullable().references('id').inTable('investors').alter()

@@ -24,6 +24,7 @@ export default class ExpenseTransformer extends BaseTransformer<Expense> {
         category: {
           id: expense.category.id,
           name: expense.category.name,
+          description: expense.category.description,
         },
       }
     }

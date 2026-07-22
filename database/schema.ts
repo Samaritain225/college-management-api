@@ -43,19 +43,6 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
-export class BudgetCategorySchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'name', 'syncedAt'] as const
-  $columns = BudgetCategorySchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare name: string
-  @column.dateTime()
-  declare syncedAt: DateTime | null
-}
-
 export class ContributionSchema extends BaseModel {
   static $columns = [
     'amount',
@@ -85,6 +72,23 @@ export class ContributionSchema extends BaseModel {
   declare paidAt: DateTime
   @column()
   declare recordedBy: string
+  @column.dateTime()
+  declare syncedAt: DateTime | null
+}
+
+export class ExpenseCategorySchema extends BaseModel {
+  static $columns = ['createdAt', 'createdBy', 'description', 'id', 'name', 'syncedAt'] as const
+  $columns = ExpenseCategorySchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdBy: string | null
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
   @column.dateTime()
   declare syncedAt: DateTime | null
 }
