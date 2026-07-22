@@ -8,6 +8,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { randomUUID } from 'node:crypto'
 import ExpenseCategoryTransformer from '#transformers/expense_category_transformer'
 import activityService from '#services/activity_service'
+import { manageUsers } from '#abilities/main'
 
 export default class ExpenseCategoriesController {
   /**
@@ -34,7 +35,7 @@ export default class ExpenseCategoriesController {
    * POST /expense-categories
    */
   async store({ request, response, auth, bouncer, serialize }: HttpContext) {
-    if (await bouncer.denies('manageUsers')) {
+    if (await bouncer.denies(manageUsers)) {
       return response.forbidden({ message: 'Unauthorized to create expense categories' })
     }
 
@@ -64,7 +65,7 @@ export default class ExpenseCategoriesController {
    * PATCH /expense-categories/:id
    */
   async update({ params, request, response, auth, bouncer, serialize }: HttpContext) {
-    if (await bouncer.denies('manageUsers')) {
+    if (await bouncer.denies(manageUsers)) {
       return response.forbidden({ message: 'Unauthorized to update expense categories' })
     }
 
@@ -99,7 +100,7 @@ export default class ExpenseCategoriesController {
    * DELETE /expense-categories/:id
    */
   async destroy({ params, response, auth, bouncer }: HttpContext) {
-    if (await bouncer.denies('manageUsers')) {
+    if (await bouncer.denies(manageUsers)) {
       return response.forbidden({ message: 'Unauthorized to delete expense categories' })
     }
 

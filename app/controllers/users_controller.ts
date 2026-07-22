@@ -5,13 +5,14 @@ import UserTransformer from '#transformers/user_transformer'
 import { createUserValidator, updateUserValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import { randomUUID } from 'node:crypto'
+import { manageUsers, manageAdmins } from '#abilities/main'
 
 export default class UsersController {
   /**
    * GET /users
    */
   async index({ bouncer, response, serialize }: HttpContext) {
-    if (await bouncer.denies('manageUsers')) {
+    if (await bouncer.denies(manageUsers)) {
       return response.forbidden({ message: 'Unauthorized access to user management' })
     }
 
@@ -25,7 +26,7 @@ export default class UsersController {
    * POST /users
    */
   async store({ request, response, auth, bouncer, serialize }: HttpContext) {
-    if (await bouncer.denies('manageUsers')) {
+    if (await bouncer.denies(manageUsers)) {
       return response.forbidden({ message: 'Unauthorized to create users' })
     }
 
@@ -34,7 +35,7 @@ export default class UsersController {
 
     // Check role restrictions: only super_admin can create admin/super_admin roles
     if (payload.roleId !== 'investor') {
-      if (await bouncer.denies('manageAdmins')) {
+      if (await bouncer.denies(manageAdmins)) {
         return response.forbidden({
           message: 'Only super admins can create admin or super admin accounts',
         })
@@ -89,7 +90,7 @@ export default class UsersController {
       payload.roleId && (payload.roleId === 'admin' || payload.roleId === 'super_admin')
 
     if (isTargetAdminOrSuper || isNewRoleAdminOrSuper) {
-      if (await bouncer.denies('manageAdmins')) {
+      if (await bouncer.denies(manageAdmins)) {
         return response.forbidden({
           message: 'Only super admins can modify admin or super admin accounts',
         })
@@ -148,7 +149,7 @@ export default class UsersController {
 
     // Manage admins check
     if (user.roleId === 'admin') {
-      if (await bouncer.denies('manageAdmins')) {
+      if (await bouncer.denies(manageAdmins)) {
         return response.forbidden({ message: 'Only super admins can deactivate admins' })
       }
     }
@@ -180,7 +181,7 @@ export default class UsersController {
 
     // Manage admins check
     if (user.roleId === 'admin' || user.roleId === 'super_admin') {
-      if (await bouncer.denies('manageAdmins')) {
+      if (await bouncer.denies(manageAdmins)) {
         return response.forbidden({ message: 'Only super admins can reactivate admin accounts' })
       }
     }

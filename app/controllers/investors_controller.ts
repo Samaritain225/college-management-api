@@ -6,13 +6,14 @@ import { DateTime } from 'luxon'
 import InvestorTransformer from '#transformers/investor_transformer'
 import { TABLES } from '#constants/tables'
 import activityService from '#services/activity_service'
+import { manageUsers } from '#abilities/main'
 
 export default class InvestorsController {
   /**
    * GET /investors
    */
   async index({ bouncer, response, serialize }: HttpContext) {
-    if (await bouncer.denies('manageUsers')) {
+    if (await bouncer.denies(manageUsers)) {
       return response.forbidden({ message: 'Unauthorized access to investor management' })
     }
 
@@ -33,7 +34,7 @@ export default class InvestorsController {
    * POST /investors
    */
   async store({ request, response, auth, bouncer, serialize }: HttpContext) {
-    if (await bouncer.denies('manageUsers')) {
+    if (await bouncer.denies(manageUsers)) {
       return response.forbidden({ message: 'Unauthorized to create investors' })
     }
 
@@ -65,7 +66,7 @@ export default class InvestorsController {
    * PATCH /investors/:id
    */
   async update({ params, request, response, auth, bouncer, serialize }: HttpContext) {
-    if (await bouncer.denies('manageUsers')) {
+    if (await bouncer.denies(manageUsers)) {
       return response.forbidden({ message: 'Unauthorized to update investors' })
     }
 
