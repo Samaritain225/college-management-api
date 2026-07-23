@@ -55,8 +55,13 @@ export default class UsersController {
     activityService.log({
       userId: currentUser.id,
       action: 'USER_CREATE',
-      description: `User created: ${user.name} (${user.email})`,
-      metadata: { targetUserId: user.id, role: user.roleId },
+      metadata: {
+        targetUserId: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.roleId,
+        actorName: currentUser.name,
+      },
     })
 
     return serialize({
@@ -123,8 +128,12 @@ export default class UsersController {
     activityService.log({
       userId: auth.getUserOrFail().id,
       action: 'USER_UPDATE',
-      description: `User updated: ${user.name} (${user.email})`,
-      metadata: { targetUserId: user.id },
+      metadata: {
+        targetUserId: user.id,
+        name: user.name,
+        email: user.email,
+        actorName: auth.getUserOrFail().name,
+      },
     })
 
     return serialize({
@@ -160,8 +169,12 @@ export default class UsersController {
     activityService.log({
       userId: auth.getUserOrFail().id,
       action: 'USER_DEACTIVATE',
-      description: `User deactivated: ${user.name} (${user.email})`,
-      metadata: { targetUserId: user.id },
+      metadata: {
+        targetUserId: user.id,
+        name: user.name,
+        email: user.email,
+        actorName: auth.getUserOrFail().name,
+      },
     })
 
     return serialize({
@@ -192,8 +205,12 @@ export default class UsersController {
     activityService.log({
       userId: auth.getUserOrFail().id,
       action: 'USER_REACTIVATE',
-      description: `User reactivated: ${user.name} (${user.email})`,
-      metadata: { targetUserId: user.id },
+      metadata: {
+        targetUserId: user.id,
+        name: user.name,
+        email: user.email,
+        actorName: auth.getUserOrFail().name,
+      },
     })
 
     return serialize({

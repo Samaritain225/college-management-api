@@ -203,7 +203,7 @@ export class UserActivitySchema extends BaseModel {
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
-  declare description: string
+  declare description: string | null
   @column({ isPrimary: true })
   declare id: string
   @column()

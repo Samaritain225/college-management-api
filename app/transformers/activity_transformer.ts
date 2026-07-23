@@ -22,6 +22,7 @@ export default class ActivityTransformer extends BaseTransformer<UserActivity> {
 
     const payload: any = {
       ...base,
+      userName: activity.user?.name ?? parsedMetadata?.actorName ?? null,
       metadata: parsedMetadata,
     }
 

@@ -48,8 +48,7 @@ export default class ExpenseCategoriesController {
     activityService.log({
       userId: currentUser.id,
       action: 'EXPENSE_CATEGORY_CREATE',
-      description: `Expense category created: ${category.name}`,
-      metadata: { categoryId: category.id },
+      metadata: { categoryId: category.id, name: category.name, actorName: currentUser.name },
     })
 
     return serialize({

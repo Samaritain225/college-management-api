@@ -3,8 +3,8 @@ import { TABLES } from '#constants/tables'
 
 export const createInvestorValidator = vine.compile(
   vine.object({
-    name: vine.string().maxLength(255),
-    agreedContribution: vine.number().min(0),
+    name: vine.string().minLength(3).maxLength(255),
+    agreedContribution: vine.number().min(0).optional(),
     joinedAt: vine.string().nullable().optional(),
     userId: vine
       .string()

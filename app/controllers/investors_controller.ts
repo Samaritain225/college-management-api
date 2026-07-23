@@ -44,7 +44,7 @@ export default class InvestorsController {
     const investor = await Investor.create({
       id: randomUUID(),
       name: payload.name,
-      agreedContribution: payload.agreedContribution,
+      agreedContribution: payload.agreedContribution ?? 0,
       joinedAt: payload.joinedAt ? DateTime.fromISO(payload.joinedAt) : DateTime.now(),
       userId: payload.userId ?? null,
       createdBy: currentUser.id,
@@ -53,8 +53,12 @@ export default class InvestorsController {
     activityService.log({
       userId: currentUser.id,
       action: 'INVESTOR_CREATE',
-      description: `Investor created: ${investor.name}`,
-      metadata: { investorId: investor.id, agreedContribution: investor.agreedContribution },
+      metadata: {
+        investorId: investor.id,
+        name: investor.name,
+        agreedContribution: investor.agreedContribution,
+        actorName: currentUser.name,
+      },
     })
 
     return serialize({
@@ -84,8 +88,11 @@ export default class InvestorsController {
     activityService.log({
       userId: auth.getUserOrFail().id,
       action: 'INVESTOR_UPDATE',
-      description: `Investor updated: ${investor.name}`,
-      metadata: { investorId: investor.id },
+      metadata: {
+        investorId: investor.id,
+        name: investor.name,
+        actorName: auth.getUserOrFail().name,
+      },
     })
 
     return serialize({

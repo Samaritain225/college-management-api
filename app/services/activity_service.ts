@@ -3,7 +3,7 @@ import emitter from '@adonisjs/core/services/emitter'
 export interface ActivityPayload {
   userId: string | null
   action: string
-  description: string
+  description?: string | null
   metadata?: any
 }
 

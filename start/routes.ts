@@ -4,6 +4,7 @@ import router from '@adonisjs/core/services/router'
 const AccessTokensController = () => import('#controllers/access_tokens_controller')
 const UsersController = () => import('#controllers/users_controller')
 const InvestorsController = () => import('#controllers/investors_controller')
+const ContributionsController = () => import('#controllers/contributions_controller')
 const RolesController = () => import('#controllers/roles_controller')
 const ExpenseCategoriesController = () => import('#controllers/expense_categories_controller')
 const ExpensesController = () => import('#controllers/expenses_controller')
@@ -38,6 +39,12 @@ router
     router
       .resource('investors', InvestorsController)
       .only(['index', 'store', 'update'])
+      .use('*', middleware.auth())
+
+    // Contribution management routes
+    router
+      .resource('contributions', ContributionsController)
+      .only(['index', 'store'])
       .use('*', middleware.auth())
 
     // Expense category routes

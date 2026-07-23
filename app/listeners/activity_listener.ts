@@ -16,7 +16,7 @@ export default class ActivityListener {
         id: randomUUID(),
         userId: payload.userId,
         action: payload.action,
-        description: payload.description,
+        description: payload.description ?? null,
         metadata: encryptedMetadata,
       })
     } catch (error) {

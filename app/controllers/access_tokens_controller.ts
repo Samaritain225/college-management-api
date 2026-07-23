@@ -53,7 +53,6 @@ export default class AccessTokensController {
       activityService.log({
         userId: null,
         action: 'AUTH_LOGIN_FAILED',
-        description: `Failed login attempt for email: ${email}`,
         metadata: { email },
       })
       return response.unauthorized({
@@ -65,8 +64,7 @@ export default class AccessTokensController {
       activityService.log({
         userId: user.id,
         action: 'AUTH_LOGIN_FAILED',
-        description: `Login blocked — account deactivated for user: ${user.name}`,
-        metadata: { email },
+        metadata: { email, name: user.name, reason: 'deactivated', actorName: user.name },
       })
       return response.forbidden({
         errors: [{ message: 'account deactivated' }],
@@ -79,8 +77,7 @@ export default class AccessTokensController {
       activityService.log({
         userId: user.id,
         action: 'AUTH_LOGIN_FAILED',
-        description: `Invalid password attempt for user: ${user.name}`,
-        metadata: { email },
+        metadata: { email, name: user.name, reason: 'invalid_password', actorName: user.name },
       })
       return response.unauthorized({
         errors: [{ message: 'Invalid credentials' }],
@@ -96,7 +93,7 @@ export default class AccessTokensController {
     activityService.log({
       userId: user.id,
       action: 'AUTH_LOGIN',
-      description: `User logged in: ${user.name}`,
+      metadata: { email: user.email, name: user.name, actorName: user.name },
     })
 
     return serialize({
@@ -133,7 +130,6 @@ export default class AccessTokensController {
       activityService.log({
         userId: dbToken.userId,
         action: 'AUTH_TOKEN_REUSE_DETECTED',
-        description: 'Revoked refresh token was reused — all sessions invalidated',
       })
 
       return response.unauthorized({
@@ -167,7 +163,7 @@ export default class AccessTokensController {
     activityService.log({
       userId: user.id,
       action: 'AUTH_TOKEN_REFRESHED',
-      description: `Access token refreshed for user: ${user.name}`,
+      metadata: { actorName: user.name },
     })
 
     return {
@@ -206,7 +202,7 @@ export default class AccessTokensController {
     activityService.log({
       userId: user.id,
       action: 'AUTH_LOGOUT',
-      description: `User logged out: ${user.name}`,
+      metadata: { name: user.name, actorName: user.name },
     })
 
     return {
