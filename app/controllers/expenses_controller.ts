@@ -1,5 +1,5 @@
 import Expense from '#models/expense'
-import { createExpenseValidator, updateExpenseValidator } from '#validators/expense'
+import { createExpenseValidator } from '#validators/expense'
 import type { HttpContext } from '@adonisjs/core/http'
 import { randomUUID } from 'node:crypto'
 import { DateTime } from 'luxon'
@@ -58,57 +58,5 @@ export default class ExpensesController {
     return serialize({
       expense: ExpenseTransformer.transform(expense),
     })
-  }
-
-  /**
-   * PATCH /expenses/:id
-   */
-  async update({ params, request, auth, serialize }: HttpContext) {
-    const currentUser = auth.getUserOrFail()
-    const expense = await Expense.findOrFail(params.id)
-    const payload = await request.validateUsing(updateExpenseValidator)
-
-    expense.merge({
-      amount: payload.amount ?? expense.amount,
-      categoryId: payload.categoryId ?? expense.categoryId,
-      description: payload.description ?? expense.description,
-      spentAt: payload.spentAt ? DateTime.fromISO(payload.spentAt) : expense.spentAt,
-      receiptPhotoPath:
-        payload.receiptPhotoPath !== undefined
-          ? payload.receiptPhotoPath
-          : expense.receiptPhotoPath,
-    })
-
-    await expense.save()
-    await expense.load('category')
-
-    activityService.log({
-      userId: currentUser.id,
-      action: 'EXPENSE_UPDATE',
-      description: `Expense updated: ${expense.description} — ${expense.amount}`,
-      metadata: { expenseId: expense.id, categoryId: expense.categoryId },
-    })
-
-    return serialize({
-      expense: ExpenseTransformer.transform(expense),
-    })
-  }
-
-  /**
-   * DELETE /expenses/:id
-   */
-  async destroy({ params, response, auth }: HttpContext) {
-    const currentUser = auth.getUserOrFail()
-    const expense = await Expense.findOrFail(params.id)
-
-    activityService.log({
-      userId: currentUser.id,
-      action: 'EXPENSE_DELETE',
-      description: `Expense deleted: ${expense.description} — ${expense.amount}`,
-      metadata: { expenseId: expense.id },
-    })
-
-    await expense.delete()
-    return response.noContent()
   }
 }

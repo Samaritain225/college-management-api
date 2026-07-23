@@ -43,11 +43,14 @@ router
     // Expense category routes
     router
       .resource('expense-categories', ExpenseCategoriesController)
-      .apiOnly()
+      .only(['index', 'show', 'store'])
       .use('*', middleware.auth())
 
     // Expense routes
-    router.resource('expenses', ExpensesController).apiOnly().use('*', middleware.auth())
+    router
+      .resource('expenses', ExpensesController)
+      .only(['index', 'show', 'store'])
+      .use('*', middleware.auth())
 
     // User activities log routes
     router.get('/activities', [ActivitiesController, 'index']).use(middleware.auth())

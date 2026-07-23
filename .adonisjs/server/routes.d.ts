@@ -16,18 +16,35 @@ export type ScannedRoutes = {
     'investors.index': { paramsTuple?: []; params?: {} }
     'investors.store': { paramsTuple?: []; params?: {} }
     'investors.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expense_categories.index': { paramsTuple?: []; params?: {} }
+    'expense_categories.store': { paramsTuple?: []; params?: {} }
+    'expense_categories.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expenses.index': { paramsTuple?: []; params?: {} }
+    'expenses.store': { paramsTuple?: []; params?: {} }
+    'expenses.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'activities.index': { paramsTuple?: []; params?: {} }
     'roles.index': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'access_tokens.show': { paramsTuple?: []; params?: {} }
     'users.index': { paramsTuple?: []; params?: {} }
     'investors.index': { paramsTuple?: []; params?: {} }
+    'expense_categories.index': { paramsTuple?: []; params?: {} }
+    'expense_categories.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expenses.index': { paramsTuple?: []; params?: {} }
+    'expenses.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'activities.index': { paramsTuple?: []; params?: {} }
     'roles.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'access_tokens.show': { paramsTuple?: []; params?: {} }
     'users.index': { paramsTuple?: []; params?: {} }
     'investors.index': { paramsTuple?: []; params?: {} }
+    'expense_categories.index': { paramsTuple?: []; params?: {} }
+    'expense_categories.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expenses.index': { paramsTuple?: []; params?: {} }
+    'expenses.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'activities.index': { paramsTuple?: []; params?: {} }
     'roles.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
@@ -36,6 +53,12 @@ export type ScannedRoutes = {
     'access_tokens.destroy': { paramsTuple?: []; params?: {} }
     'users.store': { paramsTuple?: []; params?: {} }
     'investors.store': { paramsTuple?: []; params?: {} }
+    'expense_categories.store': { paramsTuple?: []; params?: {} }
+    'expenses.store': { paramsTuple?: []; params?: {} }
+  }
+  PUT: {
+    'users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'investors.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

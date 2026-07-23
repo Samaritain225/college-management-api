@@ -20,6 +20,19 @@ export interface ApiDefinition {
     store: typeof routes['investors.store']
     update: typeof routes['investors.update']
   }
+  expenseCategories: {
+    index: typeof routes['expense_categories.index']
+    store: typeof routes['expense_categories.store']
+    show: typeof routes['expense_categories.show']
+  }
+  expenses: {
+    index: typeof routes['expenses.index']
+    store: typeof routes['expenses.store']
+    show: typeof routes['expenses.show']
+  }
+  activities: {
+    index: typeof routes['activities.index']
+  }
   roles: {
     index: typeof routes['roles.index']
   }

@@ -43,7 +43,7 @@ const routes = {
     types: placeholder as Registry['users.store']['types'],
   },
   'users.update': {
-    methods: ["PATCH"],
+    methods: ["PUT","PATCH"],
     pattern: '/api/v1/users/:id',
     tokens: [{"old":"/api/v1/users/:id","type":0,"val":"api","end":""},{"old":"/api/v1/users/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/users/:id","type":0,"val":"users","end":""},{"old":"/api/v1/users/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['users.update']['types'],
@@ -73,10 +73,52 @@ const routes = {
     types: placeholder as Registry['investors.store']['types'],
   },
   'investors.update': {
-    methods: ["PATCH"],
+    methods: ["PUT","PATCH"],
     pattern: '/api/v1/investors/:id',
     tokens: [{"old":"/api/v1/investors/:id","type":0,"val":"api","end":""},{"old":"/api/v1/investors/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/investors/:id","type":0,"val":"investors","end":""},{"old":"/api/v1/investors/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['investors.update']['types'],
+  },
+  'expense_categories.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/expense-categories',
+    tokens: [{"old":"/api/v1/expense-categories","type":0,"val":"api","end":""},{"old":"/api/v1/expense-categories","type":0,"val":"v1","end":""},{"old":"/api/v1/expense-categories","type":0,"val":"expense-categories","end":""}],
+    types: placeholder as Registry['expense_categories.index']['types'],
+  },
+  'expense_categories.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/expense-categories',
+    tokens: [{"old":"/api/v1/expense-categories","type":0,"val":"api","end":""},{"old":"/api/v1/expense-categories","type":0,"val":"v1","end":""},{"old":"/api/v1/expense-categories","type":0,"val":"expense-categories","end":""}],
+    types: placeholder as Registry['expense_categories.store']['types'],
+  },
+  'expense_categories.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/expense-categories/:id',
+    tokens: [{"old":"/api/v1/expense-categories/:id","type":0,"val":"api","end":""},{"old":"/api/v1/expense-categories/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/expense-categories/:id","type":0,"val":"expense-categories","end":""},{"old":"/api/v1/expense-categories/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['expense_categories.show']['types'],
+  },
+  'expenses.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/expenses',
+    tokens: [{"old":"/api/v1/expenses","type":0,"val":"api","end":""},{"old":"/api/v1/expenses","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses","type":0,"val":"expenses","end":""}],
+    types: placeholder as Registry['expenses.index']['types'],
+  },
+  'expenses.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/expenses',
+    tokens: [{"old":"/api/v1/expenses","type":0,"val":"api","end":""},{"old":"/api/v1/expenses","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses","type":0,"val":"expenses","end":""}],
+    types: placeholder as Registry['expenses.store']['types'],
+  },
+  'expenses.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/expenses/:id',
+    tokens: [{"old":"/api/v1/expenses/:id","type":0,"val":"api","end":""},{"old":"/api/v1/expenses/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses/:id","type":0,"val":"expenses","end":""},{"old":"/api/v1/expenses/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['expenses.show']['types'],
+  },
+  'activities.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/activities',
+    tokens: [{"old":"/api/v1/activities","type":0,"val":"api","end":""},{"old":"/api/v1/activities","type":0,"val":"v1","end":""},{"old":"/api/v1/activities","type":0,"val":"activities","end":""}],
+    types: placeholder as Registry['activities.index']['types'],
   },
   'roles.index': {
     methods: ["GET","HEAD"],
