@@ -16,19 +16,26 @@ export default class ExpenseTransformer extends BaseTransformer<Expense> {
       'createdAt',
     ])
 
-    // If preloaded category info, we can expose it
     const expense = this.resource as any
-    if (expense.category) {
-      return {
-        ...base,
-        category: {
-          id: expense.category.id,
-          name: expense.category.name,
-          description: expense.category.description,
-        },
-      }
+    return {
+      ...base,
+      ...(expense.category
+        ? {
+            category: {
+              id: expense.category.id,
+              name: expense.category.name,
+              description: expense.category.description,
+            },
+          }
+        : {}),
+      ...(expense.recorder
+        ? {
+            recorder: {
+              id: expense.recorder.id,
+              name: expense.recorder.name,
+            },
+          }
+        : {}),
     }
-
-    return base
   }
 }

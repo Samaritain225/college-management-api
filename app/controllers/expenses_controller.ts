@@ -11,7 +11,10 @@ export default class ExpensesController {
    * GET /expenses
    */
   async index({ serialize }: HttpContext) {
-    const expenses = await Expense.query().preload('category').orderBy('spentAt', 'desc')
+    const expenses = await Expense.query()
+      .preload('category')
+      .preload('recorder')
+      .orderBy('spentAt', 'desc')
     return serialize({
       expenses: ExpenseTransformer.transform(expenses),
     })
@@ -23,6 +26,7 @@ export default class ExpensesController {
   async show({ params, serialize }: HttpContext) {
     const expense = await Expense.findOrFail(params.id)
     await expense.load('category')
+    await expense.load('recorder')
     return serialize({
       expense: ExpenseTransformer.transform(expense),
     })
@@ -47,6 +51,7 @@ export default class ExpensesController {
     })
 
     await expense.load('category')
+    await expense.load('recorder')
 
     activityService.log({
       userId: currentUser.id,
